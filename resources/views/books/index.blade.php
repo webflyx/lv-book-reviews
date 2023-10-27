@@ -6,6 +6,12 @@
 
 @section('content')
 
+    <form action="{{ route('books.index') }}" method="GET" class="mb-6 flex gap-4 items-center">
+        <input class="w-full" type="text" name="title" value="{{ request('title') }}">
+        <button class="btn-secondary" type="submit">Search</button>
+        <a class="btn-secondary" href="{{ route('books.index') }}">Clear</a>
+    </form>
+
     @forelse ($books as $book)
         <div class="flex items-center justify-between px-3 py-4 border border-gray-200 shadow-md rounded-lg mb-5">
             <div>
