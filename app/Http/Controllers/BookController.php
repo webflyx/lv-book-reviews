@@ -32,7 +32,7 @@ class BookController extends Controller
         //$books = cache()->remember('books', 3600, fn() => $books->get());
 
         $cacheKey = 'books:' . $filter . ':' . $title;
-        cache()->forget($cacheKey);
+        //cache()->forget($cacheKey);
         $books = cache()->remember(
             $cacheKey,
             3600,
@@ -46,7 +46,6 @@ class BookController extends Controller
                 } else {
                     return $books->paginate(10);
                 }
-                
             }
         );
         
@@ -80,7 +79,7 @@ class BookController extends Controller
         // ->withReviewsCount()->withAvgRating()->findOrFail($book->id);
 
         $cahceKey = 'book:' . $book->id;
-        cache()->forget($cahceKey);
+        //cache()->forget($cahceKey);
         $book = cache()->remember(
             $cahceKey,
             3600,
