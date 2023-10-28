@@ -37,7 +37,7 @@ class Book extends Model
     }
 
 
-    public function scopePopularByDate(Builder $query, $from = null, $to = null): Builder
+    public function scopePopularRangeDate(Builder $query, $from = null, $to = null): Builder
     {
         return $query->withCount([
             'reviews' => fn(Builder $q) => $this->datesRange($q, $from, $to),
@@ -50,7 +50,7 @@ class Book extends Model
         return $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating','desc');
     }
 
-    public function scopeBestRatingByDate(Builder $query, $from = null, $to = null): Builder
+    public function scopeBestRatingRangeDate(Builder $query, $from = null, $to = null): Builder
     {
         return $query->withAvg([
             'reviews' => fn(Builder $q) => $this->datesRange($q, $from, $to)
@@ -66,6 +66,18 @@ class Book extends Model
     public function scopeMaxReviews(Builder $query, int $maxReviews): Builder
     {
         return $query->having('reviews_count', '<=' , $maxReviews);
+    }
+
+    public function scopePopularLastMonths(Builder $query, int $popularLastMonths = 1): Builder
+    {
+        return $query->popularRangeDate(now()->subMonths($popularLastMonths), now())
+        ->bestRatingRangeDate(now()->subMonths($popularLastMonths), now())->minReviews(2);
+    }
+
+    public function scopeBestRatingMonths(Builder $query, int $popularLastMonths = 1): Builder
+    {
+        return $query->bestRatingRangeDate(now()->subMonths($popularLastMonths), now())
+        ->popularRangeDate(now()->subMonths($popularLastMonths), now())->minReviews(2);
     }
 
 }
