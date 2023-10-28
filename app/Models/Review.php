@@ -9,6 +9,17 @@ class Review extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::updated(function(Review $review){
+            cache()->forget('book:'. $review->book_id);
+        });
+        
+        static::deleted(function(Review $review){
+            cache()->forget('book:'. $review->book_id);
+        });
+    }
+
     protected $fillable = ['review', 'rating'];
 
     public function book()
