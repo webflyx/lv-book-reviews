@@ -20,19 +20,37 @@ class BookController extends Controller
             $query->title($title);
         });
 
-        $books = match($filter){
+        $books = match ($filter) {
             'popular_last_month' => $books->popularLastMonths(1),
             'popular_last_6month' => $books->popularLastMonths(6),
             'highest_rating_last_month' => $books->bestRatingMonths(1),
             'highest_rating_last_6month' => $books->bestRatingMonths(6),
-            default => $books->latest(),
-        };  
-        
+            default => $books->withReviewsCount()->withAvgRating()->latest(),
+        };
+
         //$books = $books->get();
         //$books = cache()->remember('books', 3600, fn() => $books->get());
 
-        $cacheKey = 'books:'.$filter.':'.$title;
-        $books = cache()->remember($cacheKey, 3600, fn() => $books->get());
+        $cacheKey = 'books:' . $filter . ':' . $title;
+        cache()->forget($cacheKey);
+        $books = cache()->remember(
+            $cacheKey,
+            3600,
+            function () use ($books, $filter, $title) {
+                if($filter && !$title){
+                    return $books->paginate(10)->appends(['filter' => $filter]);
+                } elseif(!$filter && $title) {
+                    return $books->paginate(10)->appends(['title' => $title]);
+                } elseif($filter && $title) {
+                    return $books->paginate(10)->appends(['title' => $title, 'filter' => $filter]);
+                } else {
+                    return $books->paginate(10);
+                }
+                
+            }
+        );
+        
+        
 
         return view('books.index', compact('books'));
     }
@@ -58,10 +76,17 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        
-        //$book = $book->load(['reviews' => fn($query) => $query->latest()]);
-        $cahceKey = 'book:'.$book->id;
-        $book = cache()->remember($cahceKey, 3600, fn() => $book->load(['reviews' => fn($query) => $query->latest()]));
+        // $book = Book::with(['reviews' => fn($query) => $query->latest()])
+        // ->withReviewsCount()->withAvgRating()->findOrFail($book->id);
+
+        $cahceKey = 'book:' . $book->id;
+        cache()->forget($cahceKey);
+        $book = cache()->remember(
+            $cahceKey,
+            3600,
+            fn () => Book::with(['reviews' => fn ($query) => $query->latest()])
+                ->withReviewsCount()->withAvgRating()->findOrFail($book->id)
+        );
 
         return view('books.show', compact('book'));
     }

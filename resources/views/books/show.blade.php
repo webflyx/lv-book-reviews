@@ -6,7 +6,7 @@
 
 @section('sub-title')
     <div class="text-gray-600">by {{$book->author}}</div>
-    <div class="mt-2">Rating: {{ $book->reviews_avg_rating ?? 0 }} out of {{ $book->reviews_count ?? 0 }} {{ Str::plural('review', $book->reviews_count ?? 0) }}</div>
+    <div class="mt-2">Rating: {{ number_format($book->reviews_avg_rating ?? 0, 2) }} out of {{ $book->reviews_count ?? 0 }} {{ Str::plural('review', $book->reviews_count ?? 0) }}</div>
 @endsection
 
 @section('content')

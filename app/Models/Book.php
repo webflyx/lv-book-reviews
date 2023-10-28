@@ -10,6 +10,17 @@ class Book extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::updated(function(Book $book){
+            cache()->forget('book:'. $book->id);
+        });
+        
+        static::deleted(function(Book $book){
+            cache()->forget('book:'. $book->id);
+        });
+    }
+
     private function datesRange(Builder $q, $from = null, $to = null)
     {
         if($from && !$to){
@@ -26,6 +37,16 @@ class Book extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function scopeWithReviewsCount(Builder $query): Builder
+    {
+        return $query->withCount('reviews');
+    }
+
+    public function scopeWithAvgRating(Builder $query): Builder
+    {
+        return $query->withAvg('reviews', 'rating');
+    }
+
     public function scopeTitle(Builder $query, string $title): Builder
     {
         return $query->where('title', 'LIKE', "%{$title}%");
@@ -33,7 +54,7 @@ class Book extends Model
 
     public function scopePopular(Builder $query): Builder
     {
-        return $query->withCount('reviews')->orderBy('reviews_count', 'desc');
+        return $query->withReviewsCount()->orderBy('reviews_count', 'desc');
     }
 
 
@@ -47,7 +68,7 @@ class Book extends Model
 
     public function scopeBestRating(Builder $query): Builder
     {
-        return $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating','desc');
+        return $query->withAvgRating()->orderBy('reviews_avg_rating','desc');
     }
 
     public function scopeBestRatingRangeDate(Builder $query, $from = null, $to = null): Builder

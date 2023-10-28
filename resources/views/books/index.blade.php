@@ -25,8 +25,13 @@
 
     <div class="flex p-2 border border-blue-200 bg-blue-100 rounded-lg mb-6">
         @foreach ($filters as $key => $label)
-            <div @class(['filter-item', 'filter-item-active' => request('filter') === $key || (request('filter') === null && $key === '')]) >
-                <a href="{{ route('books.index', [...request()->query(), 'filter' => $key ]) }}">{{ $label }}</a>
+            <div @class([
+                'filter-item',
+                'filter-item-active' =>
+                    request('filter') === $key ||
+                    (request('filter') === null && $key === ''),
+            ])>
+                <a href="{{ route('books.index', [...request()->query(), 'filter' => $key, 'page' => 1]) }}">{{ $label }}</a>
             </div>
         @endforeach
     </div>
@@ -48,5 +53,13 @@
             <a href="{{ route('books.index') }}" class="block mt-3 underline">Reset filters</a>
         </div>
     @endforelse
+
+    @if($books->count())
+        <div class="mt-5">
+            <nav>
+                {{ $books->links() }}
+            </nav>
+        </div>
+    @endif
 
 @endsection
