@@ -30,7 +30,7 @@ class BookController extends Controller
         
         //dd($books->toSql());
         
-        $books =    $books->get();
+        $books = $books->get();
 
         return view('books.index', compact('books'));
     }
@@ -56,7 +56,8 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        $book = $book->load(['reviews' => fn($query) => $query->latest()]);
+        return view('books.show', compact('book'));
     }
 
     /**

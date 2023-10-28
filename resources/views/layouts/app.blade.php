@@ -33,6 +33,7 @@
 
     <header class="container mx-auto max-w-3xl mb-6 border-b pb-2 border-gray-200">
         <h1 class="text-3xl">@yield('title')</h1>
+        @yield('sub-title')
     </header>
 
     <div class="container mx-auto max-w-3xl">
