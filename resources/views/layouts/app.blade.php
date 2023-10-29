@@ -26,10 +26,18 @@
             @apply  bg-white
         }
 
+        input, textarea, select {
+            @apply border border-gray-300 shadow-lg w-full rounded-md px-2 py-1
+        }
+
     </style>
 
 </head>
 <body class="my-10">
+
+    @if (session()->has('success'))
+        <div class="container mx-auto max-w-3xl mb-6 border rounded-md border-green-600 px-5 py-2 bg-green-100">{{ session('success') }}</div>
+    @endif
 
     <header class="container mx-auto max-w-3xl mb-6 border-b pb-2 border-gray-200">
         <h1 class="text-3xl">@yield('title')</h1>

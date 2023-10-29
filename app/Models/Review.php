@@ -18,6 +18,10 @@ class Review extends Model
         static::deleted(function(Review $review){
             cache()->forget('book:'. $review->book_id);
         });
+        
+        static::created(function(Review $review){
+            cache()->forget('book:'. $review->book_id);
+        });
     }
 
     protected $fillable = ['review', 'rating'];
